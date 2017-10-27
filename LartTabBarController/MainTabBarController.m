@@ -59,21 +59,29 @@
     schlNav.navigationBarHidden = NO;
     mineNav.navigationBarHidden = NO;
     
-    self.tabBar.tintColor = [UIColor blueColor];
+    self.tabBar.tintColor = [UIColor colorWithRed:29/255.f green:93/255.f blue:167/255.f alpha:1];
     self.tabBar.translucent = NO;
     [self setViewControllers:@[homeNav, findNav, funyNav, schlNav, mineNav]];
     
     //设置中间大图
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-    NSData *data = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"selectedItem.gif"]];
+    NSData *data = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"centerItem.gif"]];
     [self setCenterItemGifImageData:data];
+    NSData *badgeData = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"badge.png"]];
     
     //设置BadgeValue
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         homeVC.tabBarItem.badgeValue = @"8";
         findVC.tabBarItem.badgeValue = @"new";
-        schlVC.tabBarItem.badgeGifData = data;
+        schlVC.tabBarItem.badgeImage = [UIImage imageNamed:@"badge.png"];
         mineVC.tabBarItem.badgeRedDot = YES;
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        mineVC.tabBarItem.badgeValue = @"8";
+        schlVC.tabBarItem.badgeValue = @"new";
+        findVC.tabBarItem.badgeImage = [UIImage imageNamed:@"badge.png"];
+        homeVC.tabBarItem.badgeRedDot = YES;
     });
 }
 

@@ -13,7 +13,7 @@
 #pragma mark - ------------------------ 属性Setter&Getter --------------------------
 static const char LPTabBarItemDelegateKey = '\0';
 - (void)setDelegate:(id<LPTabBarItemDelegate>)delegate {
-    if (delegate != self.delegate) {
+    if (delegate != self.delegate || !delegate) {
         [self willChangeValueForKey:@"delegate"]; // KVO
         objc_setAssociatedObject(self, &LPTabBarItemDelegateKey,
                                  delegate, OBJC_ASSOCIATION_ASSIGN);

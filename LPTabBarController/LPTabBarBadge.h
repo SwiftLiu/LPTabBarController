@@ -20,6 +20,7 @@
 
 ///主色彩，默认为红色(255,0,0)
 @property (copy, nonatomic) UIColor *tintColor;
-///value半径，默认为20
-@property (assign, nonatomic) CGFloat radius;
+///value直径，默认为18
+@property (assign, nonatomic) CGFloat wide;
 @end
+

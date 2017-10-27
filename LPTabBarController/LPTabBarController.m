@@ -101,7 +101,7 @@
 #pragma mark - ------------------------ 属性Setter&Getter --------------------------
 static const char TabBarItemBadgeImageKey = '\0';
 - (void)setBadgeImage:(UIImage *)badgeImage {
-    if (badgeImage != self.badgeImage) {
+    if (badgeImage != self.badgeImage || !badgeImage) {
         // 存储新的
         [self willChangeValueForKey:@"badgeImage"]; // KVO
         objc_setAssociatedObject(self, &TabBarItemBadgeImageKey,
