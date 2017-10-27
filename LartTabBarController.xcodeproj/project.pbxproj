@@ -25,6 +25,7 @@
 		AC084CD01FA09BB200022BE2 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AC084CD41FA0A56100022BE2 /* UIImage+GifImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+GifImage.h"; sourceTree = "<group>"; };
 		AC084CD51FA0A56100022BE2 /* UIImage+GifImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+GifImage.m"; sourceTree = "<group>"; };
+		AC28474D1FA38B3F00CF61B8 /* LPTabBarBadge.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LPTabBarBadge.bundle; sourceTree = "<group>"; };
 		AC2F1BEC1FA038D50063AEFB /* LPTabBarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LPTabBarView.xib; sourceTree = "<group>"; };
 		AC34C4301FA1917600EDF41F /* UITabBarItem+LPTabBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITabBarItem+LPTabBarItem.h"; sourceTree = "<group>"; };
 		AC34C4311FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITabBarItem+LPTabBarItem.m"; sourceTree = "<group>"; };
@@ -117,6 +118,7 @@
 				AC084CD51FA0A56100022BE2 /* UIImage+GifImage.m */,
 				AC34C43A1FA1C69500EDF41F /* LPTabBarBadge.h */,
 				AC34C43B1FA1C69500EDF41F /* LPTabBarBadge.m */,
+				AC28474D1FA38B3F00CF61B8 /* LPTabBarBadge.bundle */,
 			);
 			path = LPTabBarController;
 			sourceTree = SOURCE_ROOT;

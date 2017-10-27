@@ -16,6 +16,9 @@ const CGFloat RedDotWide = 8;
 const CGFloat ElsticMaxR = 55;
 
 @interface LPTabBarBadge ()
+{
+    CGPoint touchBeganPoint;
+}
 @property (weak, nonatomic) UILabel *valueLabel;
 @property (weak, nonatomic) UIImageView *imageView;
 @end
@@ -23,6 +26,10 @@ const CGFloat ElsticMaxR = 55;
 
 @implementation LPTabBarBadge
 #pragma mark - ------------------------ 初始化、重写 --------------------------
+- (void)dealloc {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleWipe) object:nil];
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -52,6 +59,8 @@ const CGFloat ElsticMaxR = 55;
     UIImageView *imageView = [[UIImageView alloc] init];
     imageView.contentMode = UIViewContentModeCenter;
     imageView.clipsToBounds = NO;
+    imageView.animationDuration = .25;
+    imageView.animationRepeatCount = 1;
     [self addSubview:imageView];
     self.imageView = imageView;
     
@@ -91,6 +100,70 @@ const CGFloat ElsticMaxR = 55;
     //imageView
     self.imageView.center = centerP;
 }
+
+
+
+
+//MARK: 触摸事件
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint p = [touches.anyObject locationInView:self];
+    touchBeganPoint = p;
+    NSLog(@"触摸开始：(%lf,%lf)", p.x, p.y);
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint p = [touches.anyObject locationInView:self];
+    NSLog(@"触摸移动：(%lf,%lf)", p.x, p.y);
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint p = [touches.anyObject locationInView:self];
+    if (CGPointEqualToPoint(touchBeganPoint, p)) {
+        [self wipe];
+    }
+    NSLog(@"触摸结束：(%lf,%lf)", p.x, p.y);
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    CGPoint p = [touches.anyObject locationInView:self];
+    NSLog(@"触摸取消：(%lf,%lf)", p.x, p.y);
+}
+
+
+
+#pragma mark - ------------------------ 动画 --------------------------
+//MARK: 擦除动画
+- (void)wipe {
+    //添加动画帧
+    if (!self.imageView.animationImages) {
+        NSMutableArray *images = [NSMutableArray array];
+        for (int i=1; i<=5; i++) {
+            NSString *imgName = [NSString stringWithFormat:@"LPTabBarBadge.bundle/LPBadgeBomb_%d", i];
+            UIImage *img = [UIImage imageNamed:imgName];
+            if (img) {
+                [images addObject:img];
+            }
+        }
+        self.imageView.animationImages = images;
+    }
+    //执行动画
+    self.valueLabel.hidden = YES;
+    [self.imageView startAnimating];
+    
+    //动画结束处理
+    [self performSelector:@selector(handleWipe) withObject:nil afterDelay:self.imageView.animationDuration];
+}
+
+- (void)handleWipe {
+    
+}
+
+
+
+
+
+
+
 
 
 #pragma mark - ------------------------ Setter&Getter --------------------------
