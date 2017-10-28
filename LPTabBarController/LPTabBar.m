@@ -7,7 +7,7 @@
 //
 
 #import "LPTabBar.h"
-#import "LPTabBarBadge.h"
+#import "LPBadge.h"
 
 #define BADGE_BASE_TAG 50
 
@@ -94,7 +94,7 @@
 
 #pragma mark - <LPTabBarItemDelegate>协议实现
 - (void)tabBarItem:(UITabBarItem *)item didChangedBadgeValue:(NSString *)value {
-    LPTabBarBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
+    LPBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
     if (value && value.length) {
         if (!badge) {
            badge = [self addBadgeForItemAtIndex:item.indexAtTabBar];//添加Badge
@@ -103,6 +103,7 @@
             value = [value substringToIndex:6];
         }
         badge.value = value;
+        badge.style = LPBadgeStyleValue;
         if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
             badge.tintColor = item.badgeColor;
         }
@@ -113,20 +114,18 @@
 }
 
 - (void)tabBarItem:(UITabBarItem *)item didChangedBadgeColor:(UIColor *)color {
-    LPTabBarBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
+    LPBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
     badge.tintColor = color;
 }
 
 - (void)tabBarItem:(UITabBarItem *)item didChangedBadgeRedDot:(BOOL)redDot {
-    LPTabBarBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
+    LPBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
     if (redDot) {
         if (!badge) {
             badge = [self addBadgeForItemAtIndex:item.indexAtTabBar];//添加Badge
         }
-        badge.redDot = redDot;
-        if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
-            badge.tintColor = item.badgeColor;
-        }
+        badge.style = LPBadgeStyleDot;
+        badge.tintColor = [UIColor redColor];
         [self layoutBadgeAtIndex:item.indexAtTabBar];
     }else {
         [badge removeFromSuperview];//移除原有的Badge
@@ -134,12 +133,13 @@
 }
 
 - (void)tabBarItem:(UITabBarItem *)item didChangedBadgeImage:(UIImage *)image {
-    LPTabBarBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
+    LPBadge *badge = [self badgeAtIndex:item.indexAtTabBar];
     if (image) {
         if (!badge) {
             badge = [self addBadgeForItemAtIndex:item.indexAtTabBar];//添加Badge
         }
         badge.image = image;
+        badge.style = LPBadgeStyleImage;
         [self layoutBadgeAtIndex:item.indexAtTabBar];
     }else {
         [badge removeFromSuperview];//移除原有的Badge
@@ -187,14 +187,14 @@
 }
 
 //获取在指定BarItem上的Badge
-- (LPTabBarBadge *)badgeAtIndex:(NSInteger)index {
-    LPTabBarBadge *badge = [self.tabBarView viewWithTag:BADGE_BASE_TAG+index];
+- (LPBadge *)badgeAtIndex:(NSInteger)index {
+    LPBadge *badge = [self.tabBarView viewWithTag:BADGE_BASE_TAG+index];
     return badge;
 }
 
 //给指定BarItem添加Badge
-- (LPTabBarBadge *)addBadgeForItemAtIndex:(NSInteger)index {
-    LPTabBarBadge *badge = [LPTabBarBadge new];
+- (LPBadge *)addBadgeForItemAtIndex:(NSInteger)index {
+    LPBadge *badge = [LPBadge new];
     badge.tag = BADGE_BASE_TAG + index;
     CGFloat x = [self originXOfBadgeAtIndex:index];
     badge.frame = CGRectMake(x, 2, 0, 0);
@@ -204,7 +204,7 @@
 
 //重置badges的布局
 - (void)layoutBadgeAtIndex:(NSInteger)index {
-    LPTabBarBadge *badge = [self badgeAtIndex:index];
+    LPBadge *badge = [self badgeAtIndex:index];
     CGFloat x = [self originXOfBadgeAtIndex:index];
     CGSize size = badge.frame.size;
     badge.frame = CGRectMake(x, 12-size.height/2.0f, size.width, size.height);

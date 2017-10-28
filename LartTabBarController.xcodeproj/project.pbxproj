@@ -9,9 +9,10 @@
 /* Begin PBXBuildFile section */
 		AC084CD11FA09BB200022BE2 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AC084CD01FA09BB200022BE2 /* Settings.bundle */; };
 		AC084CD61FA0A56100022BE2 /* UIImage+GifImage.m in Sources */ = {isa = PBXBuildFile; fileRef = AC084CD51FA0A56100022BE2 /* UIImage+GifImage.m */; };
+		AC28CAD11FA489F3006CF73E /* LPTabBarBadge.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC28CAD01FA489F3006CF73E /* LPTabBarBadge.xcassets */; };
+		AC28CAD41FA48FD7006CF73E /* LPBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = AC28CAD31FA48FD7006CF73E /* LPBadge.m */; };
 		AC2F1BED1FA038D50063AEFB /* LPTabBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AC2F1BEC1FA038D50063AEFB /* LPTabBarView.xib */; };
 		AC34C4321FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = AC34C4311FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m */; };
-		AC34C43C1FA1C69500EDF41F /* LPTabBarBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = AC34C43B1FA1C69500EDF41F /* LPTabBarBadge.m */; };
 		AC57F8F51F9EEBAC004EFF83 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC57F8F41F9EEBAC004EFF83 /* AppDelegate.m */; };
 		AC57F8FD1F9EEBAC004EFF83 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC57F8FC1F9EEBAC004EFF83 /* Assets.xcassets */; };
 		AC57F9001F9EEBAC004EFF83 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC57F8FE1F9EEBAC004EFF83 /* LaunchScreen.storyboard */; };
@@ -25,15 +26,15 @@
 		AC084CD01FA09BB200022BE2 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AC084CD41FA0A56100022BE2 /* UIImage+GifImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+GifImage.h"; sourceTree = "<group>"; };
 		AC084CD51FA0A56100022BE2 /* UIImage+GifImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+GifImage.m"; sourceTree = "<group>"; };
-		AC28474D1FA38B3F00CF61B8 /* LPTabBarBadge.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LPTabBarBadge.bundle; sourceTree = "<group>"; };
+		AC28CAD01FA489F3006CF73E /* LPTabBarBadge.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = LPTabBarBadge.xcassets; sourceTree = "<group>"; };
+		AC28CAD21FA48FD7006CF73E /* LPBadge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LPBadge.h; sourceTree = "<group>"; };
+		AC28CAD31FA48FD7006CF73E /* LPBadge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LPBadge.m; sourceTree = "<group>"; };
 		AC2F1BEC1FA038D50063AEFB /* LPTabBarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LPTabBarView.xib; sourceTree = "<group>"; };
 		AC34C4301FA1917600EDF41F /* UITabBarItem+LPTabBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITabBarItem+LPTabBarItem.h"; sourceTree = "<group>"; };
 		AC34C4311FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITabBarItem+LPTabBarItem.m"; sourceTree = "<group>"; };
 		AC34C4341FA19EC300EDF41F /* LPBadgeView.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LPBadgeView.bundle; sourceTree = "<group>"; };
 		AC34C4351FA19EC300EDF41F /* LPBadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LPBadgeView.h; sourceTree = "<group>"; };
 		AC34C4361FA19EC300EDF41F /* LPBadgeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LPBadgeView.m; sourceTree = "<group>"; };
-		AC34C43A1FA1C69500EDF41F /* LPTabBarBadge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LPTabBarBadge.h; sourceTree = "<group>"; };
-		AC34C43B1FA1C69500EDF41F /* LPTabBarBadge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LPTabBarBadge.m; sourceTree = "<group>"; };
 		AC57F8F01F9EEBAC004EFF83 /* LartTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LartTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC57F8F31F9EEBAC004EFF83 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AC57F8F41F9EEBAC004EFF83 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -116,9 +117,9 @@
 				AC34C4311FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m */,
 				AC084CD41FA0A56100022BE2 /* UIImage+GifImage.h */,
 				AC084CD51FA0A56100022BE2 /* UIImage+GifImage.m */,
-				AC34C43A1FA1C69500EDF41F /* LPTabBarBadge.h */,
-				AC34C43B1FA1C69500EDF41F /* LPTabBarBadge.m */,
-				AC28474D1FA38B3F00CF61B8 /* LPTabBarBadge.bundle */,
+				AC28CAD21FA48FD7006CF73E /* LPBadge.h */,
+				AC28CAD31FA48FD7006CF73E /* LPBadge.m */,
+				AC28CAD01FA489F3006CF73E /* LPTabBarBadge.xcassets */,
 			);
 			path = LPTabBarController;
 			sourceTree = SOURCE_ROOT;
@@ -184,6 +185,7 @@
 				AC57F9001F9EEBAC004EFF83 /* LaunchScreen.storyboard in Resources */,
 				AC2F1BED1FA038D50063AEFB /* LPTabBarView.xib in Resources */,
 				AC084CD11FA09BB200022BE2 /* Settings.bundle in Resources */,
+				AC28CAD11FA489F3006CF73E /* LPTabBarBadge.xcassets in Resources */,
 				AC57F8FD1F9EEBAC004EFF83 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,12 +197,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC28CAD41FA48FD7006CF73E /* LPBadge.m in Sources */,
 				AC57F90F1F9EF0EF004EFF83 /* MainTabBarController.m in Sources */,
 				AC57F9031F9EEBAC004EFF83 /* main.m in Sources */,
 				AC34C4321FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m in Sources */,
 				AC57F8F51F9EEBAC004EFF83 /* AppDelegate.m in Sources */,
 				AC084CD61FA0A56100022BE2 /* UIImage+GifImage.m in Sources */,
-				AC34C43C1FA1C69500EDF41F /* LPTabBarBadge.m in Sources */,
 				AC57F90C1F9EEFED004EFF83 /* LPTabBarController.m in Sources */,
 				AC57F9121F9F414C004EFF83 /* LPTabBar.m in Sources */,
 			);

@@ -67,7 +67,6 @@
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
     NSData *data = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"centerItem.gif"]];
     [self setCenterItemGifImageData:data];
-    NSData *badgeData = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"badge.png"]];
     
     //设置BadgeValue
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -82,6 +81,13 @@
         schlVC.tabBarItem.badgeValue = @"new";
         findVC.tabBarItem.badgeImage = [UIImage imageNamed:@"badge.png"];
         homeVC.tabBarItem.badgeRedDot = YES;
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        mineVC.tabBarItem.badgeValue = @"";
+        schlVC.tabBarItem.badgeValue = nil;
+        findVC.tabBarItem.badgeImage = nil;
+        homeVC.tabBarItem.badgeRedDot = NO;
     });
 }
 
