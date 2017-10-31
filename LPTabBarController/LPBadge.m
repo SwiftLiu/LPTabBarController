@@ -8,6 +8,8 @@
 
 #import "LPBadge.h"
 
+///默认半径
+const CGFloat DefualtR = 9;
 ///最小边长
 const CGFloat MinWide = 30;
 ///小红点直径
@@ -15,19 +17,38 @@ const CGFloat RedDotWide = 8;
 ///可回弹的最大半径
 const CGFloat ElsticMaxR = 55;
 
+
+
+typedef NS_ENUM(NSInteger, BState) {
+    ///静止状态（初始默认状态）
+    BStateNormal,
+    ///拉伸状态（橡皮筋拉伸，徽标随触摸点移动）
+    BStateTensile,
+    ///回弹状态（橡皮筋回弹或擦除状态）
+    BStateBackOrWiped,
+};
+
+
+
+
+
 @interface LPBadge ()
 {
-    CGPoint touchBeganPoint;
+    CGPoint touchBeganPoint;//触摸开始的点
+    BOOL touchBeganInSelf;//触摸开始的点是否在自身内部
+    BState state;//状态
 }
+@property (weak, nonatomic, readonly) UIWindow *window;
 @property (weak, nonatomic) UILabel *valueLabel;
 @property (weak, nonatomic) UIImageView *imageView;
+@property (weak, nonatomic) CALayer *animationLayer;
 @end
 
 
 @implementation LPBadge
 #pragma mark - ------------------------ 初始化、重写 --------------------------
 - (void)dealloc {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleWipe) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reset) object:nil];
 }
 
 - (instancetype)init {
@@ -46,6 +67,8 @@ const CGFloat ElsticMaxR = 55;
 
 //初始化
 - (void)initBaseView {
+    __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
+    _window = window;
     //标签
     UILabel *valueLabel = [[UILabel alloc] init];
     valueLabel.clipsToBounds = YES;
@@ -67,7 +90,7 @@ const CGFloat ElsticMaxR = 55;
     //其它
     self.clipsToBounds = NO;
     self.tintColor = [UIColor redColor];
-    self.wide = 18;
+    self.wide = DefualtR*2;
 }
 
 - (void)layoutSubviews {
@@ -88,7 +111,7 @@ const CGFloat ElsticMaxR = 55;
     CGPoint center = self.center;
     self.bounds = CGRectMake(0, 0, MAX(size.width, MinWide), MAX(size.height, MinWide));
     self.center = center;
-    CGPoint centerP = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
+    CGPoint centerP = Center(self.bounds);
     
     //valueLabel尺寸位置
     self.valueLabel.bounds = CGRectMake(0, 0, size.width, size.height);
@@ -97,34 +120,90 @@ const CGFloat ElsticMaxR = 55;
     
     //imageView尺寸位置
     self.imageView.center = centerP;
+    
+    //动画图层
+    CGFloat w = self.bounds.size.width + ElsticMaxR;
+    CGFloat h = self.bounds.size.height + ElsticMaxR;
+    CGPoint p = [self convertPoint:centerP toView:self.window];
+    self.animationLayer.frame = CGRectMake(p.x-w, p.y-h, w, h);
+}
+
+- (CALayer *)animationLayer {
+    if (!_animationLayer) {
+        _animationLayer = [CALayer layer];
+        [self.window.layer addSublayer:_animationLayer];
+    }
+    return _animationLayer;
 }
 
 
 
 
 //MARK: 触摸事件
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    if (event.type == UIEventTypeTouches && touchBeganInSelf) {
+        return self;
+    }
+    return [super hitTest:point withEvent:event];
+}
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    CGPoint p = [touches.anyObject locationInView:self];
+    if (event.type != UIEventTypeTouches) { return; }
+    CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
+//    NSLog(@"触摸开始：(%lf,%lf)", p.x, p.y);
+    
+    state = BStateNormal;
     touchBeganPoint = p;
-    NSLog(@"触摸开始：(%lf,%lf)", p.x, p.y);
+    touchBeganInSelf = CGRectContainsPoint(self.bounds, p);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    CGPoint p = [touches.anyObject locationInView:self];
-    NSLog(@"触摸移动：(%lf,%lf)", p.x, p.y);
+    if (event.type != UIEventTypeTouches) { return; }
+    CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
+//    NSLog(@"触摸移动：(%lf,%lf)", p.x, p.y);
+    
+    //修改状态
+    if (state == BStateNormal && !CGPointEqualToPoint(touchBeganPoint, p)) {
+        [self.imageView removeFromSuperview];
+        [self.window addSubview:self.imageView];
+        [self.valueLabel removeFromSuperview];
+        [self.window addSubview:self.valueLabel];
+        state = BStateTensile;
+    }
+    
+    //拖拽
+    if (state == BStateTensile) {
+        [self dragToPoint:p];
+    }
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    CGPoint p = [touches.anyObject locationInView:self];
-    if (CGPointEqualToPoint(touchBeganPoint, p)) {
+    if (event.type != UIEventTypeTouches) { return; }
+    CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
+    NSLog(@"触摸结束：(%lf,%lf)", p.x, p.y);
+    
+    if (state==BStateNormal && CGPointEqualToPoint(touchBeganPoint, p)) {
+        [self wiped];
+    }else if (Distance(CGPointZero, p) < ElsticMaxR) {
+        [self backFromPoint:p];
+    }else {
         [self wiped];
     }
-    NSLog(@"触摸结束：(%lf,%lf)", p.x, p.y);
+    
+    state = BStateBackOrWiped;
+    self.userInteractionEnabled = NO;
+    touchBeganPoint = CGPointMake(-1, -1);
+    touchBeganInSelf = NO;
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    CGPoint p = [touches.anyObject locationInView:self];
+    if (event.type != UIEventTypeTouches) { return; }
+    CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
     NSLog(@"触摸取消：(%lf,%lf)", p.x, p.y);
+    self.userInteractionEnabled = YES;
+    state = BStateNormal;
+    touchBeganPoint = CGPointMake(-1, -1);
+    touchBeganInSelf = NO;
 }
 
 
@@ -136,6 +215,8 @@ const CGFloat ElsticMaxR = 55;
     self.imageView.hidden = NO;
     self.valueLabel.text = nil;
     self.valueLabel.hidden = YES;
+    [self.animationLayer removeFromSuperlayer];
+    self.animationLayer = nil;
     self.userInteractionEnabled = NO;
     
     //重置
@@ -147,31 +228,52 @@ const CGFloat ElsticMaxR = 55;
     }
 }
 
+//重置
 - (void)reset {
+    self.userInteractionEnabled = YES;
+    
     self.imageView.image = nil;
     self.imageView.hidden = YES;
+    [self.imageView removeFromSuperview];
+    [self addSubview:self.imageView];
+    
     self.valueLabel.text = nil;
     self.valueLabel.hidden = YES;
+    [self.valueLabel removeFromSuperview];
+    [self addSubview:self.valueLabel];
+    
+    [self layoutSubviews];
 }
 
 
 
 
 //MARK: 拖拽动画
+- (void)dragToPoint:(CGPoint)p {
+    if (Distance(CGPointZero, p) < ElsticMaxR) {
+        //绘制中间弹力部分
+        CGImageRef img = LPBadgeCreatRubber(self.bounds.size, p, self.tintColor.CGColor);
+        self.animationLayer.contents = (__bridge id _Nullable)img;
+    }
+    //位置
+    CGPoint pInSelf = CGPointMake(CGRectGetMidX(self.bounds)+p.x, CGRectGetMidY(self.bounds)+p.y);
+    CGPoint pInWindow = [self convertPoint:pInSelf toView:self.window];
+    self.imageView.center = pInWindow;
+    self.valueLabel.center = pInWindow;
+}
+
 
 //绘制拖拽动画帧图像
-void LPLayerDrawRubber(CALayer *layer, CGPoint p) {
+CGImageRef LPBadgeCreatRubber(CGSize size, CGPoint p, CGColorRef color) {
     CGFloat scale = [UIScreen mainScreen].scale;
-    CGSize size = _elasticLayer.bounds.size;
     UIGraphicsBeginImageContextWithOptions(size, NO, scale);
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSaveGState(ctx);
-    CGContextSetFillColorWithColor(ctx, _badgeLabel.backgroundColor.CGColor);
+    CGContextSetFillColorWithColor(ctx, color);
     CGContextTranslateCTM(ctx, size.width/2.l, size.height/2.l);//将坐标系移至画布中心
     
-    
     //小圆弧半径
-    CGFloat r = BadgeR - (BadgeR/2.5l) * (Distance(CGPointZero, p)/ElsticMaxR) - 2;
+    CGFloat r = DefualtR - (DefualtR/2.5l) * (Distance(CGPointZero, p)/ElsticMaxR) - 2;
     //角度，逆时针绘制
     double angle = Angle(CGPointZero, p);
     double fixAngle = M_PI_2 * 0.7l;
@@ -180,8 +282,8 @@ void LPLayerDrawRubber(CALayer *layer, CGPoint p) {
     //小圆弧与两条曲线交点
     CGPoint a1 = CGPointMake(r*cos(angle1), r*sin(angle1));
     //曲线的另一个端点
-    CGFloat x = BadgeR * sin(angle);
-    CGFloat y = BadgeR * cos(angle);
+    CGFloat x = DefualtR * sin(angle);
+    CGFloat y = DefualtR * cos(angle);
     CGPoint a2 = CGPointMake(p.x-x, p.y+y);
     CGPoint b2 = CGPointMake(p.x+x, p.y-y);
     //两曲线圆心，即二阶贝塞尔曲线控制点
@@ -194,14 +296,21 @@ void LPLayerDrawRubber(CALayer *layer, CGPoint p) {
     CGContextAddLineToPoint(ctx, a2.x, a2.y);
     CGContextAddQuadCurveToPoint(ctx, ac.x, ac.y, a1.x, a1.y);
     
-    
     CGContextDrawPath(ctx, kCGPathEOFill);
     UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
     CGContextRestoreGState(ctx);
     UIGraphicsEndImageContext();
-    _elasticLayer.contents = (__bridge id _Nullable)(img.CGImage);
+    return img.CGImage;
 }
 
+
+
+//MARK: 回弹动画
+- (void)backFromPoint:(CGPoint)p {
+    
+    //重置
+    [self performSelector:@selector(reset) withObject:nil afterDelay:.25f];
+}
 
 
 
@@ -273,6 +382,37 @@ void LPLayerDrawRubber(CALayer *layer, CGPoint p) {
     if (_style == LPBadgeStyleImage) {
         [self changeToStyle:LPBadgeStyleImage];
     }
+}
+
+
+
+
+#pragma mark - ------------------------ 辅助方法 --------------------------
+//计算两点间直线与水平线的夹角,逆时针
+double Angle(CGPoint p1, CGPoint p2) {
+    CGFloat angle = atan((p2.y-p1.y)/(p2.x-p1.x));
+    if (p2.x < p1.x) {
+        angle += M_PI;
+    }else if (p2.x == p1.x) {
+        if (p2.y > p1.y) angle = M_PI_2;
+        else angle = M_PI_2 + M_PI;
+    }
+    return angle;
+}
+
+//计算两点间距离
+double Distance(CGPoint p1, CGPoint p2) {
+    return sqrt(pow(p2.x-p1.x, 2) + pow(p2.y-p1.y, 2));
+}
+
+//Rect相对于自身的中心位置
+CGPoint Center(CGRect rect) {
+    return CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
+}
+
+//相对自身中心位置的位置
+CGPoint PointIn(CGRect rect, CGPoint p) {
+    return CGPointMake(p.x-CGRectGetMidX(rect), p.y-CGRectGetMidY(rect));
 }
 
 @end
