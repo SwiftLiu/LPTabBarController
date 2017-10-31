@@ -39,16 +39,17 @@ typedef NS_ENUM(NSInteger, BState) {
     BState state;//状态
 }
 @property (weak, nonatomic, readonly) UIWindow *window;
-@property (weak, nonatomic) UILabel *valueLabel;
-@property (weak, nonatomic) UIImageView *imageView;
-@property (weak, nonatomic) CALayer *animationLayer;
+@property (strong, nonatomic) UILabel *valueLabel;
+@property (strong, nonatomic) UIImageView *imageView;
+@property (strong, nonatomic) CALayer *animationLayer;
 @end
 
 
 @implementation LPBadge
 #pragma mark - ------------------------ 初始化、重写 --------------------------
 - (void)dealloc {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reset) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetAfterWiped) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetAfterBacked) object:nil];
 }
 
 - (instancetype)init {
@@ -70,22 +71,25 @@ typedef NS_ENUM(NSInteger, BState) {
     __weak UIWindow *window = [[UIApplication sharedApplication].delegate window];
     _window = window;
     //标签
-    UILabel *valueLabel = [[UILabel alloc] init];
-    valueLabel.clipsToBounds = YES;
-    valueLabel.font = [UIFont systemFontOfSize:11];
-    valueLabel.textColor = [UIColor whiteColor];
-    valueLabel.textAlignment = NSTextAlignmentCenter;
-    valueLabel.hidden = YES;
-    [self addSubview:valueLabel];
-    self.valueLabel = valueLabel;
+    self.valueLabel = [[UILabel alloc] init];
+    self.valueLabel.clipsToBounds = YES;
+    self.valueLabel.font = [UIFont systemFontOfSize:11];
+    self.valueLabel.textColor = [UIColor whiteColor];
+    self.valueLabel.textAlignment = NSTextAlignmentCenter;
+    self.valueLabel.hidden = YES;
+    [self addSubview:self.valueLabel];
     
     //图片容器
-    UIImageView *imageView = [[UIImageView alloc] init];
-    imageView.contentMode = UIViewContentModeCenter;
-    imageView.clipsToBounds = NO;
-    imageView.hidden = YES;
-    [self addSubview:imageView];
-    self.imageView = imageView;
+    self.imageView = [[UIImageView alloc] init];
+    self.imageView.contentMode = UIViewContentModeCenter;
+    self.imageView.clipsToBounds = NO;
+    self.imageView.hidden = YES;
+    [self addSubview:self.imageView];
+    
+    //动画图层
+    self.animationLayer = [CALayer layer];
+    self.animationLayer.contentsGravity = kCAGravityCenter;
+    self.animationLayer.backgroundColor = [UIColor lightGrayColor].CGColor;
     
     //其它
     self.clipsToBounds = NO;
@@ -122,19 +126,10 @@ typedef NS_ENUM(NSInteger, BState) {
     self.imageView.center = centerP;
     
     //动画图层
-    CGFloat w = self.bounds.size.width + ElsticMaxR;
-    CGFloat h = self.bounds.size.height + ElsticMaxR;
     CGPoint p = [self convertPoint:centerP toView:self.window];
-    self.animationLayer.frame = CGRectMake(p.x-w, p.y-h, w, h);
+    self.animationLayer.frame = CGRectMake(p.x-ElsticMaxR, p.y-ElsticMaxR, ElsticMaxR*2, ElsticMaxR*2);
 }
 
-- (CALayer *)animationLayer {
-    if (!_animationLayer) {
-        _animationLayer = [CALayer layer];
-        [self.window.layer addSublayer:_animationLayer];
-    }
-    return _animationLayer;
-}
 
 
 
@@ -168,6 +163,8 @@ typedef NS_ENUM(NSInteger, BState) {
         [self.window addSubview:self.imageView];
         [self.valueLabel removeFromSuperview];
         [self.window addSubview:self.valueLabel];
+        [self.window.layer addSublayer:self.animationLayer];
+        [self layoutSubviews];
         state = BStateTensile;
     }
     
@@ -180,7 +177,7 @@ typedef NS_ENUM(NSInteger, BState) {
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (event.type != UIEventTypeTouches) { return; }
     CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
-    NSLog(@"触摸结束：(%lf,%lf)", p.x, p.y);
+//    NSLog(@"触摸结束：(%lf,%lf)", p.x, p.y);
     
     if (state==BStateNormal && CGPointEqualToPoint(touchBeganPoint, p)) {
         [self wiped];
@@ -199,7 +196,8 @@ typedef NS_ENUM(NSInteger, BState) {
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (event.type != UIEventTypeTouches) { return; }
     CGPoint p = PointIn(self.bounds, [touches.anyObject locationInView:self]);
-    NSLog(@"触摸取消：(%lf,%lf)", p.x, p.y);
+//    NSLog(@"触摸取消：(%lf,%lf)", p.x, p.y);
+    
     self.userInteractionEnabled = YES;
     state = BStateNormal;
     touchBeganPoint = CGPointMake(-1, -1);
@@ -216,11 +214,11 @@ typedef NS_ENUM(NSInteger, BState) {
     self.valueLabel.text = nil;
     self.valueLabel.hidden = YES;
     [self.animationLayer removeFromSuperlayer];
-    self.animationLayer = nil;
+    self.animationLayer.contents = nil;
     self.userInteractionEnabled = NO;
     
     //重置
-    [self performSelector:@selector(reset) withObject:nil afterDelay:.25f];
+    [self performSelector:@selector(resetAfterWiped) withObject:nil afterDelay:.25f];
     
     //回调处理
     if (self.wipeHandler) {
@@ -229,7 +227,7 @@ typedef NS_ENUM(NSInteger, BState) {
 }
 
 //重置
-- (void)reset {
+- (void)resetAfterWiped {
     self.userInteractionEnabled = YES;
     
     self.imageView.image = nil;
@@ -252,8 +250,12 @@ typedef NS_ENUM(NSInteger, BState) {
 - (void)dragToPoint:(CGPoint)p {
     if (Distance(CGPointZero, p) < ElsticMaxR) {
         //绘制中间弹力部分
-        CGImageRef img = LPBadgeCreatRubber(self.bounds.size, p, self.tintColor.CGColor);
+        CGFloat d = Distance(CGPointZero, p);
+        CGImageRef img = LPBadgeCreatRubber(CGSizeMake(d*2, d*2), p, self.tintColor.CGColor);
         self.animationLayer.contents = (__bridge id _Nullable)img;
+    }else {
+        [self.animationLayer removeFromSuperlayer];
+        self.animationLayer.contents = nil;
     }
     //位置
     CGPoint pInSelf = CGPointMake(CGRectGetMidX(self.bounds)+p.x, CGRectGetMidY(self.bounds)+p.y);
@@ -271,7 +273,6 @@ CGImageRef LPBadgeCreatRubber(CGSize size, CGPoint p, CGColorRef color) {
     CGContextSaveGState(ctx);
     CGContextSetFillColorWithColor(ctx, color);
     CGContextTranslateCTM(ctx, size.width/2.l, size.height/2.l);//将坐标系移至画布中心
-    
     //小圆弧半径
     CGFloat r = DefualtR - (DefualtR/2.5l) * (Distance(CGPointZero, p)/ElsticMaxR) - 2;
     //角度，逆时针绘制
@@ -309,9 +310,24 @@ CGImageRef LPBadgeCreatRubber(CGSize size, CGPoint p, CGColorRef color) {
 - (void)backFromPoint:(CGPoint)p {
     
     //重置
-    [self performSelector:@selector(reset) withObject:nil afterDelay:.25f];
+    [self performSelector:@selector(resetAfterBacked) withObject:nil afterDelay:.5f];
 }
 
+//重置
+- (void)resetAfterBacked {
+    self.userInteractionEnabled = YES;
+    
+    [self.imageView removeFromSuperview];
+    [self addSubview:self.imageView];
+    
+    [self.valueLabel removeFromSuperview];
+    [self addSubview:self.valueLabel];
+    
+    [self.animationLayer removeFromSuperlayer];
+    self.animationLayer.contents = nil;
+    
+    [self layoutSubviews];
+}
 
 
 
