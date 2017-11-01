@@ -76,12 +76,12 @@
         mineVC.tabBarItem.badgeRedDot = YES;
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        mineVC.tabBarItem.badgeValue = @"8";
-        schlVC.tabBarItem.badgeValue = @"new";
-        findVC.tabBarItem.badgeImage = [UIImage imageNamed:@"badge.png"];
-        homeVC.tabBarItem.badgeRedDot = YES;
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        mineVC.tabBarItem.badgeValue = @"8";
+//        schlVC.tabBarItem.badgeValue = @"new";
+//        findVC.tabBarItem.badgeImage = [UIImage imageNamed:@"badge.png"];
+//        homeVC.tabBarItem.badgeRedDot = YES;
+//    });
 //
 //    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 //        mineVC.tabBarItem.badgeValue = @"";

@@ -36,5 +36,5 @@ typedef NS_ENUM(NSInteger, LPBadgeStyle) {
 @property (copy, nonatomic) void (^wipeHandler)(void);
 
 /** 擦除Badge */
-- (void)wiped;
+- (void)wipedWithAnimated:(BOOL)animated;
 @end

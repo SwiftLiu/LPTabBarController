@@ -32,9 +32,6 @@
 		AC2F1BEC1FA038D50063AEFB /* LPTabBarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LPTabBarView.xib; sourceTree = "<group>"; };
 		AC34C4301FA1917600EDF41F /* UITabBarItem+LPTabBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITabBarItem+LPTabBarItem.h"; sourceTree = "<group>"; };
 		AC34C4311FA1917600EDF41F /* UITabBarItem+LPTabBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITabBarItem+LPTabBarItem.m"; sourceTree = "<group>"; };
-		AC34C4341FA19EC300EDF41F /* LPBadgeView.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LPBadgeView.bundle; sourceTree = "<group>"; };
-		AC34C4351FA19EC300EDF41F /* LPBadgeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LPBadgeView.h; sourceTree = "<group>"; };
-		AC34C4361FA19EC300EDF41F /* LPBadgeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LPBadgeView.m; sourceTree = "<group>"; };
 		AC57F8F01F9EEBAC004EFF83 /* LartTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LartTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC57F8F31F9EEBAC004EFF83 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AC57F8F41F9EEBAC004EFF83 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -61,16 +58,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AC34C4331FA19EC300EDF41F /* LPBadgeView */ = {
-			isa = PBXGroup;
-			children = (
-				AC34C4341FA19EC300EDF41F /* LPBadgeView.bundle */,
-				AC34C4351FA19EC300EDF41F /* LPBadgeView.h */,
-				AC34C4361FA19EC300EDF41F /* LPBadgeView.m */,
-			);
-			path = LPBadgeView;
-			sourceTree = "<group>";
-		};
 		AC57F8E71F9EEBAC004EFF83 = {
 			isa = PBXGroup;
 			children = (
@@ -107,7 +94,6 @@
 		AC57F9091F9EEFA7004EFF83 /* LPTabBarController */ = {
 			isa = PBXGroup;
 			children = (
-				AC34C4331FA19EC300EDF41F /* LPBadgeView */,
 				AC57F90A1F9EEFED004EFF83 /* LPTabBarController.h */,
 				AC57F90B1F9EEFED004EFF83 /* LPTabBarController.m */,
 				AC57F9101F9F414C004EFF83 /* LPTabBar.h */,
