@@ -136,12 +136,12 @@ const CGFloat ElsticMaxR = 60;
 //MARK: 外部方法 擦除
 - (void)wipedWithAnimated:(BOOL)animated {
     if (animated) {
-        [self wiped];
+        [self startWipedAnimating];
     }else {
         [self resetAfterWiped];
         //回调处理
-        if (self.wipeHandler) {
-            self.wipeHandler();
+        if (self.delegate && [self.delegate respondsToSelector:@selector(badge:didWipedWithAnimated:)]) {
+            [self.delegate badge:self didWipedWithAnimated:NO];
         }
     }
 }
@@ -164,12 +164,11 @@ const CGFloat ElsticMaxR = 60;
     
     //进入拉伸状态
     if (state == LPBStateNormal && !CGPointEqualToPoint(touchBeganPoint, p)) {
+        [self.window.layer addSublayer:self.animationLayer];
         [self.imageView removeFromSuperview];
         [self.valueLabel removeFromSuperview];
         [self.window addSubview:self.imageView];
         [self.window addSubview:self.valueLabel];
-        [self.window.layer addSublayer:self.animationLayer];
-        
         state = LPBStateTensile;
     }
     
@@ -194,11 +193,11 @@ const CGFloat ElsticMaxR = 60;
     CGPoint p = [self locationOfTouches:touches];//以self自身中心为原点的坐标
     
     if (state==LPBStateTensile) {
-        [self backFromPoint:p];
+        [self startBackAnimatingFrom:p];
     }else if (state==LPBStateBreak && Distance(CGPointZero, p)<ElsticMaxR) {
         [self resetAfterBacked];
     }else {
-        [self wiped];
+        [self startWipedAnimating];
     }
     
     //进入自动回弹或擦除状态
@@ -225,7 +224,7 @@ const CGFloat ElsticMaxR = 60;
 
 #pragma mark - ------------------------ 动画 --------------------------
 //MARK: 擦除动画
-- (void)wiped {
+- (void)startWipedAnimating {
     self.imageView.image = [UIImage animatedImageNamed:@"LPBadgeBomb" duration:.25];
     self.imageView.hidden = NO;
     self.valueLabel.text = nil;
@@ -238,8 +237,8 @@ const CGFloat ElsticMaxR = 60;
     [self performSelector:@selector(resetAfterWiped) withObject:nil afterDelay:.25f];
     
     //回调处理
-    if (self.wipeHandler) {
-        self.wipeHandler();
+    if (self.delegate && [self.delegate respondsToSelector:@selector(badge:didWipedWithAnimated:)]) {
+        [self.delegate badge:self didWipedWithAnimated:YES];
     }
 }
 
@@ -282,17 +281,40 @@ const CGFloat ElsticMaxR = 60;
 
 
 //MARK: 回弹动画
-- (void)backFromPoint:(CGPoint)p {
+- (void)startBackAnimatingFrom:(CGPoint)p {
     self.userInteractionEnabled = NO;
     [self.animationLayer removeFromSuperlayer];
     self.animationLayer.contents = nil;
     
     //动画
-    //MARK: NeedDo <<<<<<<<<<<<<<<<<<<<<<<<< 动画 >>>>>>>>>>>>>>>>>>>>>>>>>
-    
-    //重置
-    [self performSelector:@selector(resetAfterBacked) withObject:nil afterDelay:.5f];
+    [self backFrom:p count:0];
 }
+
+//回弹动画
+- (void)backFrom:(CGPoint)p count:(NSInteger)count {
+    self.userInteractionEnabled = NO;
+    CGFloat m = 0.3; //回弹力消弱系数
+    
+    //新的目标地址
+    p.x = - p.x * m;
+    p.y = - p.y * m;
+    CGPoint center = [self convertPoint:Center(self.bounds) toView:self.window];
+    CGPoint pInWindow = CGPointMake(center.x+p.x, center.y+p.y);
+    
+    //动画
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.1 animations:^{
+        weakSelf.imageView.center = pInWindow;
+        weakSelf.valueLabel.center = pInWindow;
+    } completion:^(BOOL finished) {
+        if (finished && count < 4) {
+            [weakSelf backFrom:p count:count+1];//循环调用，继续执行动画
+        }else{
+            [self resetAfterBacked];
+        }
+    }];
+}
+
 
 //重置
 - (void)resetAfterBacked {
@@ -341,7 +363,7 @@ const CGFloat ElsticMaxR = 60;
             self.imageView.image = _image;
             self.valueLabel.hidden = YES;
             self.imageView.hidden = NO;
-            self.userInteractionEnabled = _image;
+            self.userInteractionEnabled = _image!=nil;
         }
             break;
         default:
